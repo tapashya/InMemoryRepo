@@ -3,33 +3,42 @@ using System.Linq;
 
 namespace Interview
 {
+    // In memory implementation of IRepository<T, I> 
+
     public class Repository<T, I> : IRepository<T, I> where T : IStoreable<I>
     {
-        private List<T> repositoryObjects;
+        private List<T> _repositoryObjects;
 
         public Repository()
         {
-            repositoryObjects = new List<T>();
+            _repositoryObjects = new List<T>();
         }
 
         public IEnumerable<T> GetAll()
         {
-            return repositoryObjects;
+            return _repositoryObjects;
         }
 
         public T Get(I id)
         {
-            return repositoryObjects.FirstOrDefault(e=>e.Id.Equals(id));
+            return _repositoryObjects.FirstOrDefault(e=>e.Id.Equals(id));
         }
 
         public void Delete(I id)
         {
-            repositoryObjects.Remove(repositoryObjects.First(obj => obj.Id.Equals(id)));
+            foreach (var n in _repositoryObjects.Where(obj => obj.Id.Equals(id)).ToArray())
+            {
+                _repositoryObjects.Remove(n);
+            }
         }
 
         public void Save(T item)
         {
-            repositoryObjects.Add(item);
+            if (_repositoryObjects.FirstOrDefault(obj => obj.Id.Equals(item.Id)) != null)
+            {
+                Delete(item.Id); //if we don't want duplicates
+            }
+            _repositoryObjects.Add(item);
         }
     }
 }

@@ -4,54 +4,62 @@ using NUnit.Framework;
 
 namespace Interview
 {
-
     public class RepositoryTests
     {
-        private IRepository<MockStoreable, int> repository;
-        private IEnumerable<MockStoreable> allRepoObjects;
-        private MockStoreable newRepoObject;
-        private MockStoreable existingRepoObject;
-        private MockStoreable expectedRepoObject;
-
+        private IRepository<MockStoreable, int> _repository;
+        private IEnumerable<MockStoreable> _allRepoObjects;
+        private MockStoreable _newRepoObject, _existingRepoObject, _expectedRepoObject;
+        
         [Test]
         public void Test_Repository_Returns_IEnumerable()
         {
-            repository = new Repository<MockStoreable, int>();
-            allRepoObjects = repository.GetAll();
-            Assert.IsInstanceOf<IEnumerable<MockStoreable>>(allRepoObjects);
+            _repository = new Repository<MockStoreable, int>();
+            _allRepoObjects = _repository.GetAll();
+            Assert.IsInstanceOf<IEnumerable<MockStoreable>>(_allRepoObjects);
         }
-
 
         [Test]
         public void Test_Repository_GetById()
         {
-            repository = new Repository<MockStoreable, int>();
-            existingRepoObject = new MockStoreable { Id = 100 };
-            repository.Save(existingRepoObject);
-            expectedRepoObject = repository.Get(100);
-            Assert.AreEqual(expectedRepoObject.Id, existingRepoObject.Id);
+            _repository = new Repository<MockStoreable, int>();
+            _existingRepoObject = new MockStoreable { Id = 100 };
+            _repository.Save(_existingRepoObject);
+            _expectedRepoObject = _repository.Get(100);
+            Assert.AreEqual(_expectedRepoObject.Id, _existingRepoObject.Id);
         }
 
         [Test]
         public void Test_Repository_Delete()
         {
-            repository = new Repository<MockStoreable, int>();
-            existingRepoObject = new MockStoreable { Id = 100 };
-            repository.Save(existingRepoObject);
-            repository.Delete(100);
-            allRepoObjects = repository.GetAll();
+            _repository = new Repository<MockStoreable, int>();
+            _existingRepoObject = new MockStoreable { Id = 100 };
+            _repository.Save(_existingRepoObject);
+            _repository.Delete(100);
+            _allRepoObjects = _repository.GetAll();
 
-            Assert.IsFalse(allRepoObjects.Contains(existingRepoObject));
+            Assert.IsFalse(_allRepoObjects.Contains(_existingRepoObject));
         }
 
         [Test]
         public void Test_Repository_Save()
         {
-            repository = new Repository<MockStoreable, int>();
-            newRepoObject = new MockStoreable { Id = 100 };
-            repository.Save(newRepoObject);
-            allRepoObjects = repository.GetAll();
-            Assert.IsTrue(allRepoObjects.Contains(newRepoObject));
+            _repository = new Repository<MockStoreable, int>();
+            _newRepoObject = new MockStoreable { Id = 100 };
+            _repository.Save(_newRepoObject);
+            _allRepoObjects = _repository.GetAll();
+            Assert.IsTrue(_allRepoObjects.Contains(_newRepoObject));
+        }
+
+        [Test]
+        public void Test_Repository_Save_NoDuplicates()
+        {
+            _repository = new Repository<MockStoreable, int>();
+            _existingRepoObject = new MockStoreable { Id = 100 };
+            _repository.Save(_newRepoObject);
+            _newRepoObject = new MockStoreable { Id = 100 };
+            _repository.Save(_newRepoObject);
+            _allRepoObjects = _repository.GetAll();
+            Assert.AreEqual(_allRepoObjects.Count(),1);
         }
 
     }
